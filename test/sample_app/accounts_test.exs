@@ -21,7 +21,13 @@ defmodule SampleApp.AccountsTest do
     end
 
     test "create_user/1 with valid data creates a user" do
-      valid_attrs = %{name: "some name", email: "some@gmail.com", password: "somepass123", password_confirmation: "somepass123"}
+      valid_attrs = %{
+        name: "some name",
+        email: "some@gmail.com",
+        password: "somepass123",
+        password_confirmation: "somepass123"
+      }
+
       assert {:ok, %User{} = user} = Accounts.create_user(valid_attrs)
     end
 

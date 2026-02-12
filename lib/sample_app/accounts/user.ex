@@ -21,7 +21,11 @@ defmodule SampleApp.Accounts.User do
     |> validate_required(@required_fields, message: "This field is required.")
     |> validate_length(:name, max: 50)
     |> validate_length(:email, max: 255)
-    |> validate_length(:password, min: 10, max: 72, message: "Must be between 10 to 72 characters")
+    |> validate_length(:password,
+      min: 10,
+      max: 72,
+      message: "Must be between 10 to 72 characters"
+    )
     |> validate_format(:email, @valid_email_regex)
     |> validate_confirmation(:password, message: "Does not match password")
     |> update_change(:email, &String.downcase/1)
@@ -37,6 +41,7 @@ defmodule SampleApp.Accounts.User do
         else
           changeset
         end
+
       _ ->
         changeset
     end

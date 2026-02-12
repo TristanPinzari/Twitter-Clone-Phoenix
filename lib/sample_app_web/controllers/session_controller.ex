@@ -9,14 +9,25 @@ defmodule SampleAppWeb.SessionController do
     |> render(:login, changeset: Accounts.change_user(%Accounts.User{}))
   end
 
-  def create(conn, %{"user" => user_params}) do
-    case Accounts.authenticate_by_email_and_pass(user_params["email"], user_params["password"]) do
+  def create(conn, %{
+        "user" => %{
+          "email" => email,
+          "password" => password,
+          "remember" => remember
+        }
+      }) do
+    case Accounts.authenticate_by_email_and_pass(email, password) do
       {:ok, user} ->
+        conn = AuthPlug.login(conn, user)
+        conn = if remember do
+          AuthPlug.remember(conn, user)
+        else
+          delete_resp_cookie(conn, "remember_token")
+        end
         conn
-        |> AuthPlug.login(user)
-        |> AuthPlug.remember(user)
         |> put_flash(:info, "Welcome to the Sample App!")
-        |> redirect(to: ~p"/users/#{user.id}")
+        |> AuthPlug.redirect_back_or(~p"/users/#{user.id}")
+
       _ ->
         conn
         |> put_flash(:error, "Invalid credentials")

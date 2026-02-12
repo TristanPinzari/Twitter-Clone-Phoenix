@@ -1,5 +1,7 @@
 defmodule SampleAppWeb.AuthPlug do
+  use SampleAppWeb, :verified_routes
   import Plug.Conn
+  import Phoenix.Controller
   alias SampleApp.Accounts
 
   def init(opts), do: opts
@@ -24,9 +26,8 @@ defmodule SampleAppWeb.AuthPlug do
 
       true ->
         assign(conn, :current_user, nil)
-
     end
-end
+  end
 
   def login(conn, user) do
     conn
@@ -44,6 +45,47 @@ end
 
   def remember(conn, user) do
     token = SampleApp.Token.gen_remember_token(user)
-    put_resp_cookie(conn, "remember_token", token, max_age: 2629746)
+    put_resp_cookie(conn, "remember_token", token, max_age: 2_629_746)
+  end
+
+  def logged_in_user(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> store_location()
+      |> put_flash(:error, "Please log in.")
+      |> redirect(to: ~p"/login")
+      |> halt()
+    end
+  end
+
+  def correct_user(conn, _opts) do
+    user_id = String.to_integer(conn.params["id"])
+    if user_id == conn.assigns.current_user.id do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You are not authorized there")
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
+  def redirect_back_or(conn, default) do
+    path = get_session(conn, :forward_url) || default
+    conn
+    |> delete_session(:forward_url)
+    |> redirect(to: path)
+  end
+
+  def store_location(conn) do
+    case conn do
+      %Plug.Conn{method: "GET"} ->
+        IO.puts(conn.request_path)
+        put_session(conn, :forward_url, conn.request_path)
+      _ ->
+        conn
+    end
   end
 end

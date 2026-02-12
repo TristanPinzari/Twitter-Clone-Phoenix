@@ -1,9 +1,12 @@
 <div class="min-h-screen flex flex-col">
   <div class="min-h-screen flex flex-col">
-    <.nav login={true} current_user={@current_user}/>
+    <.nav login={true} current_user={@current_user} />
     <div class="flex flex-col flex-1 items-center gap-7 mt-10">
-        <.gravatar user={@user} />
-      <h1 class="text-2xl"><%= @user.name %></h1>
+      <.gravatar user={@user} />
+      <h1 class="text-2xl">{@user.name}</h1>
+      <%= if @current_user && @current_user.email == @user.email do %>
+        <.link href={~p"/users/#{@current_user.id}/edit"} class="link">Edit profile</.link>
+      <% end %>
     </div>
   </div>
 </div>
