@@ -15,7 +15,7 @@ defmodule SampleAppWeb.AuthPlug do
             if user = Accounts.get_user(user_id) do
               login(conn, user)
             else
-              logout(conn)#
+              logout(conn)
             end
 
           {:error, _reason} ->
