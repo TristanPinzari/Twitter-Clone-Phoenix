@@ -40,6 +40,7 @@ defmodule SampleApp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:faker, "0.17.0"},
       {:pbkdf2_elixir, "~> 2.0"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},

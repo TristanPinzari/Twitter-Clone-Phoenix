@@ -16,8 +16,20 @@ defmodule SampleApp.Accounts do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
+  def list_users(params \\ %{}) do
+    page = String.to_integer(params["page"] || "1")
+    per_page = 10
+    offset = (page - 1) * per_page
+
+    User
+    |> order_by(asc: :id)
+    |> limit(^per_page)
+    |> offset(^offset)
+    |> Repo.all()
+  end
+
+  def count_users do
+    Repo.aggregate(User, :count, :id)
   end
 
   @doc """
@@ -67,6 +79,21 @@ defmodule SampleApp.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  def update_user_identity(%User{} = user, attrs) do
+    password = attrs["password"] || attrs[:password]
+
+    if Pbkdf2.verify_pass(password, user.password_hash) do
+      user
+      |> User.identity_changeset(attrs)
+      |> Repo.update()
+    else
+      user
+      |> User.identity_changeset(attrs)
+      |> Ecto.Changeset.add_error(:password, "Incorrect password")
+      |> Ecto.Changeset.apply_action(:update)
+    end
+  end
+
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)

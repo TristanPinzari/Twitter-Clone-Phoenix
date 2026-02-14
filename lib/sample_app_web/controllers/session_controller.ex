@@ -19,11 +19,14 @@ defmodule SampleAppWeb.SessionController do
     case Accounts.authenticate_by_email_and_pass(email, password) do
       {:ok, user} ->
         conn = AuthPlug.login(conn, user)
-        conn = if remember do
-          AuthPlug.remember(conn, user)
-        else
-          delete_resp_cookie(conn, "remember_token")
-        end
+
+        conn =
+          if remember do
+            AuthPlug.remember(conn, user)
+          else
+            delete_resp_cookie(conn, "remember_token")
+          end
+
         conn
         |> put_flash(:info, "Welcome to the Sample App!")
         |> AuthPlug.redirect_back_or(~p"/users/#{user.id}")

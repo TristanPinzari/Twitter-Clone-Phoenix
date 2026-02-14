@@ -41,16 +41,23 @@ defmodule SampleAppWeb.CustomComponents do
   end
 
   def gravatar(assigns) do
+    size = assigns[:size] || 200
+
     gravatar_id =
       assigns.user.email
       |> String.downcase()
       |> then(&:crypto.hash(:md5, &1))
       |> Base.encode16(case: :lower)
 
-    assigns = assign(assigns, :url, "https://secure.gravatar.com/avatar/#{gravatar_id}")
+    url = "https://secure.gravatar.com/avatar/#{gravatar_id}?s=#{size}"
+    assigns = assign(assigns, url: url, size: size)
 
     ~H"""
-    <img class="w-40 rounded-full" src={@url} alt={@user.name} class="gravatar" />
+    <img
+      src={@url}
+      alt={@user.name}
+      class="rounded-full shadow-sm"
+    />
     """
   end
 end

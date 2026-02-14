@@ -62,7 +62,20 @@ defmodule SampleAppWeb.AuthPlug do
 
   def correct_user(conn, _opts) do
     user_id = String.to_integer(conn.params["id"])
+
     if user_id == conn.assigns.current_user.id do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You are not authorized there")
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
+  end
+
+  def is_admin(conn, _opts) do
+    user = conn.assigns.current_user
+    if user && user.admin do
       conn
     else
       conn
@@ -74,6 +87,7 @@ defmodule SampleAppWeb.AuthPlug do
 
   def redirect_back_or(conn, default) do
     path = get_session(conn, :forward_url) || default
+
     conn
     |> delete_session(:forward_url)
     |> redirect(to: path)
@@ -82,8 +96,8 @@ defmodule SampleAppWeb.AuthPlug do
   def store_location(conn) do
     case conn do
       %Plug.Conn{method: "GET"} ->
-        IO.puts(conn.request_path)
         put_session(conn, :forward_url, conn.request_path)
+
       _ ->
         conn
     end
