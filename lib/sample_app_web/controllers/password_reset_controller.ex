@@ -10,11 +10,7 @@ defmodule SampleAppWeb.PasswordResetController do
     render(conn, :new)
   end
 
-  def create(conn, %{
-        "user" => %{
-          "email" => email
-        }
-      }) do
+  def create(conn, %{"email" => email}) do
     with %User{} = user <- Accounts.get_user_by(email: email) do
       Accounts.send_user_password_reset_email(user)
     end
