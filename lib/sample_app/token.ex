@@ -2,6 +2,7 @@ defmodule SampleApp.Token do
   alias SampleApp.Accounts.User
   @remember_salt "remember-use-salt"
   @activation_salt "activation-user-salt"
+  @reset_salt "reset-user-salt"
 
   def gen_remember_token(%User{id: user_id}) do
     Phoenix.Token.sign(SampleAppWeb.Endpoint, @remember_salt, user_id)
@@ -18,5 +19,14 @@ defmodule SampleApp.Token do
   def verify_activation_token(token) do
     max_age = 86_400
     Phoenix.Token.verify(SampleAppWeb.Endpoint, @activation_salt, token, max_age: max_age)
+  end
+
+  def gen_reset_token(%User{id: user_id}) do
+    Phoenix.Token.sign(SampleAppWeb.Endpoint, @reset_salt, user_id)
+  end
+
+  def verify_reset_token(token) do
+    max_age = 7200
+    Phoenix.Token.verify(SampleAppWeb.Endpoint, @reset_salt, token, max_age: max_age)
   end
 end

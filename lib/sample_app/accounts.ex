@@ -23,6 +23,7 @@ defmodule SampleApp.Accounts do
     offset = (page - 1) * per_page
 
     query = User
+
     query =
       if activated_users_only do
         where(query, [u], u.activated == true)
@@ -39,6 +40,7 @@ defmodule SampleApp.Accounts do
 
   def count_users(activated_users_only \\ true) do
     query = User
+
     query =
       if activated_users_only do
         where(query, [u], u.activated == true)
@@ -65,6 +67,7 @@ defmodule SampleApp.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
   def get_user(id), do: Repo.get(User, id)
+  def get_user_by(params), do: Repo.get_by(User, params)
 
   @doc """
   Creates a user.
@@ -181,5 +184,23 @@ defmodule SampleApp.Accounts do
     user
     |> Email.account_activation_email(activation_token)
     |> Mailer.deliver()
+  end
+
+  def send_user_password_reset_email(%User{} = user) do
+    reset_token = SampleApp.Token.gen_reset_token(user)
+
+    user
+    |> Email.password_reset_email(reset_token)
+    |> Mailer.deliver()
+  end
+
+  def password_change_user(%User{} = user) do
+    User.password_changeset(user, %{})
+  end
+
+  def update_user_password(%User{} = user, attrs) do
+    user
+    |> User.password_changeset(attrs)
+    |> Repo.update()
   end
 end

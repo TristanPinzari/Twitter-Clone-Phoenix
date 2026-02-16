@@ -30,6 +30,7 @@ defmodule SampleAppWeb.Router do
     delete "/logout", SessionController, :delete
     resources "/users", UserController
     resources "/account_activations", AccountActivationController, only: [:edit]
+    resources "/password_resets", PasswordResetController, only: [:new, :create, :edit, :update]
 
     if Mix.env() == :dev do
       get "/preview_emails/:type", PreviewEmailController, :show

@@ -1,0 +1,27 @@
+<div class="min-h-screen flex flex-col">
+  <.nav login={true} current_user={@current_user} />
+  <div class="flex flex-col flex-1 items-center px-6 py-12">
+    <div class="w-full max-w-md space-y-8 bg-white p-8 shadow-xl rounded-2xl">
+      <header class="text-center">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Forgot password</h1>
+        <p class="mt-2 text-sm text-gray-600">Enter your email to receive a reset link.</p>
+      </header>
+      <.form :let={f} for={%{}} action={~p"/password_resets"}>
+        <.input
+          field={f[:email]}
+          type="email"
+          placeholder="Email"
+          required
+          class="w-full flex justify-self-center field mb-3"
+        />
+
+        <.button
+          phx-disable-with="Sending..."
+          class="w-full bg-linear-to-r from-orange-500 to-orange-600 rounded-full py-3 text-lg font-semibold text-white shadow-xl hover:opacity-90 transition-opacity"
+        >
+          Send reset email
+        </.button>
+      </.form>
+    </div>
+  </div>
+</div>

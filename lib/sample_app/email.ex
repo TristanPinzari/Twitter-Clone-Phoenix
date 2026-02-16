@@ -23,4 +23,25 @@ defmodule SampleApp.Email do
     |> html_body(html_body_content)
     |> text_body(text_content)
   end
+
+  def password_reset_email(user, token) do
+    assigns = %{user: user, reset_token: token}
+
+    html_body_content =
+      EmailHTML.password_reset_email(assigns)
+      |> Phoenix.HTML.Safe.to_iodata()
+      |> IO.iodata_to_binary()
+
+    text_content =
+      EmailHTML.password_reset_email_text(assigns)
+      |> Phoenix.HTML.Safe.to_iodata()
+      |> IO.iodata_to_binary()
+
+    new()
+    |> to({user.name, user.email})
+    |> from({"Sample App", "tristanpinzari@gmail.com"})
+    |> subject("Sample App - Password Reset")
+    |> html_body(html_body_content)
+    |> text_body(text_content)
+  end
 end

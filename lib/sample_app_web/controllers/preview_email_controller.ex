@@ -3,10 +3,25 @@ defmodule SampleAppWeb.PreviewEmailController do
 
   plug :put_layout, false
 
-  def show(conn, _params) do
+  def show(conn, %{"type" => "account_activation"}) do
     user = %SampleApp.Accounts.User{name: "Binh Tran", email: "binh@example.com"}
     activation_token = SampleApp.Token.gen_activation_token(user)
     email = SampleApp.Email.account_activation_email(user, activation_token)
+
+    {to_name, to_email} = List.first(email.to)
+    {from_name, from_email} = email.from
+
+    render(conn, :show,
+      email: email,
+      to: "#{to_name} <#{to_email}>",
+      from: "#{from_name} <#{from_email}>"
+    )
+  end
+
+  def show(conn, %{"type" => "password_reset"}) do
+    user = %SampleApp.Accounts.User{name: "Binh Tran", email: "binh@example.com"}
+    reset_token = SampleApp.Token.gen_reset_token(user)
+    email = SampleApp.Email.password_reset_email(user, reset_token)
 
     {to_name, to_email} = List.first(email.to)
     {from_name, from_email} = email.from

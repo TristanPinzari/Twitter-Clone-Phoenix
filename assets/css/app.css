@@ -107,10 +107,18 @@
 
 /* This file is for your main application CSS */
 
+button {
+  cursor: pointer;
+}
+
 .primary-gradient {
   @apply bg-linear-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent;
 }
 
 .link {
   @apply text-sky-500 underline;
+}
+
+.field {
+  @apply bg-white border border-black/50 rounded-md gap-3 h-12 focus:outline-none focus:border-black placeholder:text-black/50 px-2 text-black;
 }

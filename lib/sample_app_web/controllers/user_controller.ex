@@ -33,11 +33,6 @@ defmodule SampleAppWeb.UserController do
         |> put_flash(:info, "Please check your email to activate your account.")
         |> redirect(to: ~p"/")
 
-      # conn
-      # |> SampleAppWeb.AuthPlug.login(user)
-      # |> put_flash(:info, "Welcome to the Sample App!")
-      # |> redirect(to: ~p"/users/#{user.id}")
-
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> render(:sign_up, changeset: changeset)

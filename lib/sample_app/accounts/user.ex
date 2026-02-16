@@ -77,4 +77,29 @@ defmodule SampleApp.Accounts.User do
       :activated_at
     ])
   end
+
+  def email_changeset(user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:email])
+    |> validate_required([:email])
+    |> validate_length(:email, max: 255)
+    |> validate_format(:email, @valid_email_regex)
+    |> update_change(:email, &String.downcase/1)
+  end
+
+  def password_changeset(user, attrs) do
+    user
+    |> cast(attrs, [
+      :password,
+      :password_confirmation
+    ])
+    |> validate_required([:password, :password_confirmation])
+    |> validate_length(:password,
+      min: 10,
+      max: 72,
+      message: "Must be between 10 to 72 characters"
+    )
+    |> validate_confirmation(:password, message: "Does not match password")
+    |> put_password_hash()
+  end
 end
