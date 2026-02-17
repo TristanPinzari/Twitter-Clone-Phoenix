@@ -86,20 +86,40 @@ defmodule SampleAppWeb.CustomComponents do
     time_stamp = time_to_words(assigns.micropost.inserted_at)
     user = assigns[:user] || assigns.micropost.user
     current_user_id = assigns[:current_user_id]
-    assigns = assign(assigns, time_stamp: time_stamp, user: user, current_user_id: current_user_id)
+
+    assigns =
+      assign(assigns, time_stamp: time_stamp, user: user, current_user_id: current_user_id)
 
     ~H"""
-    <div class="border-t py-3 flex items-center gap-5">
-      <.gravatar user={@user} size={75} />
-      <div class="flex flex-col gap-2 flex-1">
+    <div class="border-t py-3 flex flex-col gap-3">
+      <div class="flex items-center gap-5">
+        <.gravatar user={@user} size={50} />
         <p>{@user.name}</p>
-        <p>{assigns.micropost.content}</p>
-        <div class="flex gap-5 items-center">
-          <p class="text-white/50">{@time_stamp}</p>
-          <%= if @current_user_id && @current_user_id == @user.id do %>
-            <.link class="link" href={~p"/users/#{@current_user_id}/microposts/#{assigns.micropost.id}"} method="delete" data-confirm="Are you sure you want to delete this post?">delete</.link>
-          <% end %>
-        </div>
+      </div>
+      <div class="flex flex-col gap-2 flex-1 ml-15 pl-3 border-l">
+        <p>{@micropost.content}</p>
+        <%= if @micropost.image do %>
+          <.link href={"#{SampleApp.Image.url({@micropost.image, @micropost})}"}>
+            <img
+              src={"#{SampleApp.Image.url({@micropost.image, @micropost})}"}
+              alt={"#{SampleApp.Image.url({@micropost.image, @micropost})}"}
+              class="object-contain max-h-50"
+            />
+          </.link>
+        <% end %>
+      </div>
+      <div class="flex gap-5 items-center">
+        <p class="text-white/50">{@time_stamp}</p>
+        <%= if @current_user_id && @current_user_id == @user.id do %>
+          <.link
+            class="link"
+            href={~p"/users/#{@current_user_id}/microposts/#{@micropost.id}"}
+            method="delete"
+            data-confirm="Are you sure you want to delete this post?"
+          >
+            delete
+          </.link>
+        <% end %>
       </div>
     </div>
     """

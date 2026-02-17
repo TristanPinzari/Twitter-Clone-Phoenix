@@ -62,11 +62,35 @@ defmodule SampleApp.Posts do
 
   """
   def create_micropost(attrs, user) do
-    IO.inspect(attrs, label: "ssssssssssssssssssssssssssssss")
-    Ecto.build_assoc(user, :microposts)
-    |> Repo.preload(:user)
-    |> Micropost.changeset(attrs)
-    |> Repo.insert()
+    micropost_transaction =
+      Ecto.Multi.new()
+      |> Ecto.Multi.run(:assoc, fn _repo, _change ->
+        micropost =
+          Ecto.build_assoc(user, :microposts)
+          |> Repo.preload(:user)
+
+        {:ok, micropost}
+      end)
+      |> Ecto.Multi.insert(
+        :micropost,
+        &Micropost.changeset(&1.assoc, attrs)
+      )
+      |> Ecto.Multi.update(
+        :micropost_with_image,
+        &Micropost.image_changeset(&1.micropost, attrs)
+      )
+      |> Repo.transaction()
+
+    case micropost_transaction do
+      {:ok, result} ->
+        {:ok, result.micropost}
+
+      {:error, :micropost, changeset, _changes} ->
+        {:error, changeset}
+
+      {:error, :micropost_with_image, changeset, _changes} ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -99,8 +123,22 @@ defmodule SampleApp.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_micropost(%Micropost{} = micropost) do
-    Repo.delete(micropost)
+  def delete_micropost(%{micropost_id: micropost_id_str, user_id: user_id}) do
+    micropost_id = String.to_integer(micropost_id_str)
+
+    found_micropost =
+      Repo.one(
+        from m in Micropost,
+          where: m.user_id == ^user_id and ^micropost_id == m.id
+      )
+
+    case found_micropost do
+      nil ->
+        nil
+
+      _ ->
+        Repo.delete(found_micropost)
+    end
   end
 
   @doc """
