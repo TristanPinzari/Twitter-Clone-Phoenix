@@ -129,7 +129,8 @@ if config_env() == :prod do
 
 config :waffle,
   storage: Waffle.Storage.S3,
-  bucket: System.get_env("AWS_S3_BUCKET")
+  bucket: System.get_env("AWS_S3_BUCKET"),
+  asset_host: System.get_env("ASSET_HOST")
 
 config :ex_aws,
   access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
