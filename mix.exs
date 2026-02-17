@@ -40,10 +40,10 @@ defmodule SampleApp.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:waffle, "1.1.5"},
-      {:waffle_ecto, "0.0.11"},
-      {:ex_aws, "2.2.10"},
-      {:ex_aws_s3, "2.3.2"},
+      {:waffle, "~> 1.1.9"},
+      {:ex_aws, "~> 2.5"},
+      {:waffle_ecto, "~> 0.0.12"},
+      {:ex_aws_s3, "~> 2.0"},
       {:hackney, "1.18.0"},
       {:sweet_xml, "0.7.2"},
       {:timex, "3.7.6"},
