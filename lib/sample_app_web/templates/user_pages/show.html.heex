@@ -18,7 +18,7 @@
             <p>{"#{@user.name} hasn't made any posts yet."}</p>
           <% else %>
             <%= for micropost <- @user.microposts do %>
-              <.micropost micropost={micropost} user={@current_user} />
+              <.micropost micropost={micropost} user={@current_user} current_user_id={@current_user.id} />
             <% end %>
           <% end %>
         </div>

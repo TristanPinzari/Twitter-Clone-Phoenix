@@ -29,16 +29,16 @@
         <div class="flex-1">
           <div class="flex gap-4 items-center mb-5">
             <h1 class="text-3xl font-bold tracking-tight">Posts</h1>
-            <.link :if={@page > 1} navigate={~p"/home?page=#{@page - 1}"}>Previous</.link>
+            <.link :if={@page > 1} navigate={~p"/home?page=#{@page - 1}"} class="underline">Previous</.link>
             <span>Page {@page} of {@total_pages}</span>
-            <.link :if={@page < @total_pages} navigate={~p"/home?page=#{@page + 1}"}>Next</.link>
+            <.link :if={@page < @total_pages} navigate={~p"/home?page=#{@page + 1}"} class="underline">Next</.link>
           </div>
           <div class="max-h-130 overflow-y-auto flex flex-col">
             <%= if Enum.empty?(@posts) do %>
               <p>No one has posted yet. Be the first!</p>
             <% else %>
               <%= for micropost <- @posts do %>
-                <.micropost micropost={micropost} />
+                <.micropost micropost={micropost} current_user_id={@current_user.id} />
               <% end %>
             <% end %>
           </div>

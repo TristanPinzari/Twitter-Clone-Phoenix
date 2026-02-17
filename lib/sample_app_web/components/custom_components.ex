@@ -83,10 +83,10 @@ defmodule SampleAppWeb.CustomComponents do
   end
 
   def micropost(assigns) do
-    IO.inspect(assigns)
     time_stamp = time_to_words(assigns.micropost.inserted_at)
     user = assigns[:user] || assigns.micropost.user
-    assigns = assign(assigns, time_stamp: time_stamp, user: user)
+    current_user_id = assigns[:current_user_id]
+    assigns = assign(assigns, time_stamp: time_stamp, user: user, current_user_id: current_user_id)
 
     ~H"""
     <div class="border-t py-3 flex items-center gap-5">
@@ -94,7 +94,12 @@ defmodule SampleAppWeb.CustomComponents do
       <div class="flex flex-col gap-2 flex-1">
         <p>{@user.name}</p>
         <p>{assigns.micropost.content}</p>
-        <p class="text-white/50">{@time_stamp}</p>
+        <div class="flex gap-5 items-center">
+          <p class="text-white/50">{@time_stamp}</p>
+          <%= if @current_user_id && @current_user_id == @user.id do %>
+            <.link class="link" href={~p"/users/#{@current_user_id}/microposts/#{assigns.micropost.id}"} method="delete" data-confirm="Are you sure you want to delete this post?">delete</.link>
+          <% end %>
+        </div>
       </div>
     </div>
     """

@@ -4,6 +4,7 @@ defmodule SampleAppWeb.MicropostController do
   alias SampleApp.Posts.Micropost
 
   plug :logged_in_user when action in [:index, :create, :delete]
+  plug :correct_post_owner when action in [:delete]
   plug SampleAppWeb.MicropostPlug when action in [:create, :index]
 
   def index(conn, _params) do
@@ -31,6 +32,27 @@ defmodule SampleAppWeb.MicropostController do
     end
   end
 
-  def delete(conn, _params) do
+  def delete(conn, %{"id" => post_id}) do
+    post = Posts.get_micropost!(post_id)
+    conn =
+      case Posts.delete_micropost(post) do
+      {:ok, _} ->
+        put_flash(conn, :info, "Post deleted")
+      _ ->
+        put_flash(conn, :error, "Post not deleted. Something went wrong")
+    end
+    redirect(conn, to: ~p"/")
+  end
+
+  def correct_post_owner(conn, _opts) do
+    post = Posts.get_micropost!(conn.params["id"])
+    if post.user_id == conn.assigns.current_user.id do
+      assign(conn, :micropost, post)
+    else
+      conn
+      |> put_flash(:error, "You are not authorized to do this.")
+      |> redirect(to: ~p"/")
+      |> halt()
+    end
   end
 end
