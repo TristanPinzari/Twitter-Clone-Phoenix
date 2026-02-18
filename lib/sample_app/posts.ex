@@ -4,6 +4,7 @@ defmodule SampleApp.Posts do
   """
 
   import Ecto.Query, warn: false
+  require Logger
   alias SampleApp.Repo
 
   alias SampleApp.Posts.Micropost
@@ -62,23 +63,15 @@ defmodule SampleApp.Posts do
 
   """
   def create_micropost(attrs, user) do
+    struct_with_user = Ecto.build_assoc(user, :microposts)
+    base_changeset = Micropost.changeset(struct_with_user, attrs)
+
     micropost_transaction =
       Ecto.Multi.new()
-      |> Ecto.Multi.run(:assoc, fn _repo, _change ->
-        micropost =
-          Ecto.build_assoc(user, :microposts)
-          |> Repo.preload(:user)
-
-        {:ok, micropost}
-      end)
-      |> Ecto.Multi.insert(
-        :micropost,
-        &Micropost.changeset(&1.assoc, attrs)
-      )
-      |> Ecto.Multi.update(
-        :micropost_with_image,
-        &Micropost.image_changeset(&1.micropost, attrs)
-      )
+      |> Ecto.Multi.insert(:micropost, base_changeset)
+      |> Ecto.Multi.update(:micropost_with_image, fn %{micropost: post} ->
+          Micropost.image_changeset(post, attrs)
+        end)
       |> Repo.transaction()
 
     case micropost_transaction do
@@ -124,21 +117,41 @@ defmodule SampleApp.Posts do
 
   """
   def delete_micropost(%{micropost_id: micropost_id_str, user_id: user_id}) do
-    micropost_id = String.to_integer(micropost_id_str)
+    Repo.transaction(fn ->
+      micropost_id = String.to_integer(micropost_id_str)
 
-    found_micropost =
-      Repo.one(
-        from m in Micropost,
-          where: m.user_id == ^user_id and ^micropost_id == m.id
-      )
+      found_micropost =
+        Repo.one(
+          from m in Micropost,
+            where: m.user_id == ^user_id and m.id == ^micropost_id
+        )
 
-    case found_micropost do
-      nil ->
-        nil
+      case found_micropost do
+        nil ->
+          Repo.rollback(:not_found)
 
-      _ ->
-        Repo.delete(found_micropost)
-    end
+        micropost ->
+          case Repo.delete(micropost) do
+            {:ok, deleted_struct} ->
+              if deleted_struct.image do
+                try do
+                  SampleApp.Image.delete({deleted_struct.image, deleted_struct})
+                rescue
+                  e ->
+                    Repo.rollback(:error)
+                    Logger.error(
+                      "Failed to delete S3 file for post #{deleted_struct.id}: #{inspect(e)}"
+                    )
+                end
+              end
+
+              deleted_struct
+
+            {:error, changeset} ->
+              Repo.rollback(changeset)
+          end
+      end
+    end)
   end
 
   @doc """

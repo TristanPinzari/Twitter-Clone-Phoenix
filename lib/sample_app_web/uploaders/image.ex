@@ -95,8 +95,8 @@ defmodule SampleApp.Image do
   """
   def is_png?(%Waffle.File{} = file) do
     with {:ok, file_content} <- :file.open(file.path, [:read, :binary]),
-         {:ok, <<137, 80, 78, 71, 13, 10, 26, 10>>}
-          <- :file.read(file_content, 8) do
+         {:ok, <<137, 80, 78, 71, 13, 10, 26, 10>>} <-
+           :file.read(file_content, 8) do
       true
     else
       _error ->

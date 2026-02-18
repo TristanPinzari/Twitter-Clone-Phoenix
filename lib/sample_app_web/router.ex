@@ -33,7 +33,7 @@ defmodule SampleAppWeb.Router do
     resources "/password_resets", PasswordResetController, only: [:new, :create, :edit, :update]
 
     scope "/users/:user_id" do
-      resources "/microposts", MicropostController, only: [:index, :create, :delete]
+      resources "/microposts", MicropostController, only: [:create, :delete]
     end
 
     if Mix.env() == :dev do

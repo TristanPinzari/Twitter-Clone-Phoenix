@@ -5,10 +5,7 @@ defmodule SampleAppWeb.MicropostController do
 
   plug :logged_in_user when action in [:index, :create, :delete]
   plug :correct_post_owner when action in [:delete]
-  plug SampleAppWeb.MicropostPlug when action in [:create, :index]
-
-  def index(conn, _params) do
-  end
+  plug SampleAppWeb.MicropostPlug when action in [:create]
 
   def create(conn, %{"micropost" => micropost_params}) do
     case Posts.create_micropost(
@@ -35,14 +32,15 @@ defmodule SampleAppWeb.MicropostController do
   end
 
   def delete(conn, %{"id" => id}) do
-  conn =
-    case Posts.delete_micropost(%{micropost_id: id, user_id: conn.assigns.current_user.id}) do
-      {:ok, _} ->
-        put_flash(conn, :info, "Micropost deleted!")
+    yeah = Posts.delete_micropost(%{micropost_id: id, user_id: conn.assigns.current_user.id})
+    conn =
+      case yeah do
+        {:ok, _} ->
+          put_flash(conn, :info, "Micropost deleted!")
 
-      {:error, _} ->
-        put_flash(conn, :error, "Something went wrong!")
-    end
+        {:error, params} ->
+          put_flash(conn, :error, "Something went wrong!")
+      end
 
     redirect(conn, external: get_last_url(conn) || ~p"/")
   end
