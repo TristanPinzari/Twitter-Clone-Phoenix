@@ -1,18 +1,6 @@
-# SampleApp
+This is a high-performance Twitter clone built with the Phoenix Framework and Elixir. The application uses the BEAM virtual machine to handle real-time functionality such as personalized user timelines, tweet sharing, and follower systems with very high concurrency.
 
-To start your Phoenix server:
+The application has an industry-standard authentication process, which is secure for account activation and password reset. To make it production-ready, it uses PostgreSQL for relational database management, Mailjet for transactional email services, and AWS S3 for cloud media storage.
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
-
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+The project is hosted here: [https://live-vacant-ringworm.gigalixirapp.com/](url)
+However, the link may not work as I am using a free plan on Gigalixir which only allows me to host one project at a time. So, if it doesn't work that means I am hosting another project. Broke uni student moment.
